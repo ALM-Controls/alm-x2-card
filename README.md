@@ -5,6 +5,8 @@ Zwei Karten für das Raumthermostat **ALM-X2** (ALM Controls):
 - **ALM-X2 Thermostat** (`custom:alm-x2-card`): ein Thermostat mit allen Funktionen
 - **ALM-X2 Übersicht** (`custom:alm-x2-overview-card`): alle ALM-X2 kompakt untereinander (Raum, Ist-Temperatur, Zustand, Sollwert − / +); ein Klick auf den Raum klappt die vollständige Karte auf
 
+![ALM-X2 Thermostat-Karte](https://raw.githubusercontent.com/ALM-Controls/alm-x2-card/main/images/alm-x2-card.png)
+
 Die Thermostat-Karte zeigt:
 
 - Raumtemperatur, Sollwert (− / +), Zustand (heizt, kühlt, ruht, Sensorfehler, Ventilschutz)
