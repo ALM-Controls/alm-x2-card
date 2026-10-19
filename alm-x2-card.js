@@ -18,7 +18,7 @@
  * changes go to the device as MQTT commands (mqtt.publish to <device>/cmnd/thermostat/...), setpoint and mode
  * through the climate entity.
  */
-const CARD_VERSION = "0.3.1";
+const CARD_VERSION = "0.3.2";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const DAYS_DE = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
