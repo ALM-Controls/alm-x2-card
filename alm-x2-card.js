@@ -11,14 +11,14 @@
  *
  * Operating mode (heat / cool, parameter 00) and setpoint control (week program / manual) are independent:
  * the week program applies to heating and cooling alike. In HA: HVAC mode heat / cool / off, preset
- * "Wochenprogramm" / "Manuell" (firmware X2-V2.07g).
+ * "Wochenprogramm" / "Manuell" (firmware X2-V2.07).
  *
- * Needs firmware X2-V2.07g or newer (MQTT discovery with attributes). Values come from the entities of the
+ * Needs firmware X2-V2.07 or newer (MQTT discovery with attributes). Values come from the entities of the
  * device (attributes of the climate entity, "Firmware", "Komforttemperatur heute", "Einschaltdauer heute");
  * changes go to the device as MQTT commands (mqtt.publish to <device>/cmnd/thermostat/...), setpoint and mode
  * through the climate entity.
  */
-const CARD_VERSION = "0.3";
+const CARD_VERSION = "0.3.1";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const DAYS_DE = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
@@ -186,7 +186,7 @@ class AlmX2Card extends HTMLElement {
   _publish(part, obj) {
     const topic = this._e.schedule && this._e.schedule.attributes.topic;
     if (!topic) {
-      this._toast("Gerät nicht gefunden (Firmware ab X2-V2.07g nötig)", true);
+      this._toast("Gerät nicht gefunden (Firmware ab X2-V2.07 nötig)", true);
       return Promise.reject(new Error("no topic"));
     }
     return this._hass.callService("mqtt", "publish", { topic: `${topic}/cmnd/thermostat/${part}`, payload: JSON.stringify(obj) })
@@ -363,7 +363,7 @@ class AlmX2Card extends HTMLElement {
     $("card").classList.toggle("cooling", cooling);
     $("name").textContent = this._config.name || dev.name_by_user || dev.name || a.friendly_name;
     const oldFw = !e.schedule || !e.config || (a.hvac_modes || []).includes("auto");
-    $("sub").textContent = oldFw ? "Firmware ab X2-V2.07g für alle Funktionen"
+    $("sub").textContent = oldFw ? "Firmware ab X2-V2.07 für alle Funktionen"
       : (cooling ? "Kühlbetrieb" : "Heizbetrieb") + (a.locked ? " · Tastensperre" : "");
     // older firmware: "heat" means manual setpoint there, the controls would do something else (audit K5)
     this.shadowRoot.querySelectorAll("#ctrl,details").forEach((el) => el.classList.toggle("locked", oldFw));
