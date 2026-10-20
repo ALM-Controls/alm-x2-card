@@ -13,12 +13,13 @@
  * the week program applies to heating and cooling alike. In HA: HVAC mode heat / cool / off, preset
  * "Wochenprogramm" / "Manuell" (firmware X2-V2.07).
  *
- * Needs firmware X2-V2.07 or newer (MQTT discovery with attributes). Values come from the entities of the
+ * Needs firmware X2-V2.07 or newer (MQTT discovery with attributes). X2-V2.08 reports "temporary" and "relay"
+ * (true/false) instead of schedulesMode "boost" and relay1 "on"/"off"; both are read. Values come from the entities of the
  * device (attributes of the climate entity, "Firmware", "Komforttemperatur heute", "Einschaltdauer heute");
  * changes go to the device as MQTT commands (mqtt.publish to <device>/cmnd/thermostat/...), setpoint and mode
  * through the climate entity.
  */
-const CARD_VERSION = "0.3.2";
+const CARD_VERSION = "0.4";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const DAYS_DE = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
@@ -84,6 +85,11 @@ function resolveX2(hass, climate) {
     rssi: st(find((e, a) => e.startsWith("sensor.") && a.device_class === "signal_strength")),
   };
 }
+
+// setpoint changed until 0:00 / relay on: X2-V2.08 (temporary, relay) or X2-V2.07 (schedulesMode, relay1)
+const isTemporary = (a) => (a.temporary !== undefined ? !!a.temporary : a.schedulesMode === "boost");
+const isManual = (a) => (a.preset_mode || a.preset || (a.schedulesMode === "home" ? "Manuell" : "Wochenprogramm")) === "Manuell";
+const relayOn = (a) => (a.relay !== undefined ? !!a.relay : a.relay1 === "on");
 
 function x2State(c) {
   const a = c.attributes;
@@ -373,10 +379,10 @@ class AlmX2Card extends HTMLElement {
     $("act").textContent = s[0];
     $("act").className = "chip " + s[1];
     if (this._pendingSet == null) $("set").textContent = c.state === "off" ? "Aus" : fmt(a.temperature) + " °C";
-    const sm = a.schedulesMode, off = c.state === "off";
-    $("modeInfo").textContent = off ? "ausgeschaltet" : sm === "comfort" ? "nach Wochenprogramm"
-      : sm === "boost" ? "vorübergehend geändert bis 0:00 Uhr, dann Wochenprogramm" : "manueller Sollwert";
-    const preset = a.preset_mode || (sm === "home" ? "Manuell" : "Wochenprogramm");
+    const off = c.state === "off", manual = isManual(a);
+    $("modeInfo").textContent = off ? "ausgeschaltet" : manual ? "manueller Sollwert"
+      : isTemporary(a) ? "vorübergehend geändert bis 0:00 Uhr, dann Wochenprogramm" : "nach Wochenprogramm";
+    const preset = manual ? "Manuell" : "Wochenprogramm";
     $("ctrl").classList.toggle("off", off);
     this.shadowRoot.querySelectorAll("#hcSeg button").forEach((b) => b.classList.toggle("on", b.dataset.hc === (cooling ? "cool" : "heat")));
     this.shadowRoot.querySelectorAll("#prSeg button").forEach((b) => b.classList.toggle("on", b.dataset.pr === preset));
@@ -434,7 +440,7 @@ class AlmX2Card extends HTMLElement {
     const updOn = !!upd && upd.state === "on";
     $("dl").innerHTML = [
       ["Firmware", (cfg.firmware || "–") + (updOn ? " → " + (upd.attributes.latest_version || "neu") : "")],
-      ["Relais", a.relay1 === "on" ? "ein" : "aus"],
+      ["Relais", relayOn(a) ? "ein" : "aus"],
       ["WLAN", e.rssi ? e.rssi.state + " dBm" : "–"],
       ["Gerät", (dev.model || "ALM-X2") + (dev.hw_version ? " · " + dev.hw_version : "")],
       ["Karte", "alm-x2-card " + CARD_VERSION],
@@ -668,7 +674,7 @@ class AlmX2OverviewCard extends HTMLElement {
       if (!row) continue;
       const s = x2State(c);
       const cfgHc = (a.hvac_modes || []).includes("auto") ? "" : c.state === "cool" ? "Kühlen · " : c.state === "heat" ? "Heizen · " : "";
-      const mode = c.state === "unavailable" ? "" : c.state === "off" ? "aus" : cfgHc + ((a.preset_mode || (a.schedulesMode === "home" ? "Manuell" : "Wochenprogramm")) === "Manuell" ? "Manuell" : "Programm");
+      const mode = c.state === "unavailable" ? "" : c.state === "off" ? "aus" : cfgHc + (isManual(a) ? "Manuell" : "Programm");
       row.querySelector(".bar").className = "bar " + s[1];
       row.querySelector(".title").textContent = x.name;
       row.querySelector(".sub").textContent = [s[1] === "off" ? "" : s[0], mode, a.locked ? "🔒" : ""].filter(Boolean).join(" · ");

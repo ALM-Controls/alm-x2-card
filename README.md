@@ -18,7 +18,7 @@ Die Thermostat-Karte zeigt:
 
 ## Voraussetzungen
 
-- ALM-X2 mit Firmware **X2-V2.07** oder neuer
+- ALM-X2 mit Firmware **X2-V2.07** oder neuer (empfohlen: X2-V2.08)
 - Home Assistant mit MQTT-Integration; das Thermostat ist per MQTT verbunden (Weboberfläche › Netzwerk › MQTT) und erscheint automatisch als Gerät
 
 ## Installation
@@ -55,3 +55,4 @@ entities:               # optional, ohne Angabe: alle ALM-X2
 - Geräte mit Passwortschutz der Weboberfläche lassen sich trotzdem über die Karte bedienen (MQTT).
 - Die Umschaltung Heizen ↔ Kühlen fragt vorher nach.
 - Geräte mit älterer Firmware erscheinen in der Übersicht; für alle Funktionen der Thermostat-Karte ist X2-V2.07 nötig.
+- Die Karte (ab 0.4) liest die Status-Felder von X2-V2.07 und X2-V2.08; beide Firmware-Stände lassen sich gemischt verwenden.
