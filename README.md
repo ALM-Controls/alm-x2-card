@@ -23,7 +23,12 @@ Die Thermostat-Karte zeigt:
 
 ## Installation
 
-**Über HACS (empfohlen):** HACS › Frontend › „ALM-X2 Thermostat“ suchen › Herunterladen. Die Ressource wird automatisch eingetragen.
+**Über HACS (empfohlen):**
+1. HACS öffnen › Menü ⋮ (oben rechts) › „Benutzerdefinierte Repositories“.
+2. Repository `https://github.com/ALM-Controls/alm-x2-card` eintragen, Typ „Dashboard“, „Hinzufügen“.
+3. In HACS „ALM-X2 Thermostat“ öffnen › „Herunterladen“, danach den Browser neu laden. Die Ressource wird automatisch eingetragen.
+
+Die Aufnahme in die HACS-Standardliste ist beantragt; danach lässt sich die Karte direkt in HACS suchen.
 
 **Manuell:**
 1. `alm-x2-card.js` nach `/config/www/` kopieren (z. B. mit dem Add-on „File editor“ oder per Samba).
